@@ -3,8 +3,9 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { CVFormatGuide } from "@/components/CVFormatGuide";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileDown, FileText } from "lucide-react";
+import { generateCVTemplatePDF } from "@/utils/cvTemplateUtils";
+import { toast } from "sonner";
 
 interface IdealCVPageProps {
   onContinue: () => void;
@@ -16,8 +17,13 @@ const IdealCVPage: React.FC<IdealCVPageProps> = ({
   onBack
 }) => {
   const handleDownloadTemplate = () => {
-    // In a real app, this would download a template CV
-    alert("In a real application, this would download a template CV document.");
+    try {
+      generateCVTemplatePDF();
+      toast.success("CV template downloaded successfully");
+    } catch (error) {
+      toast.error("Failed to download CV template");
+      console.error("PDF generation error:", error);
+    }
   };
 
   return (
@@ -45,10 +51,14 @@ const IdealCVPage: React.FC<IdealCVPageProps> = ({
           </CardContent>
         </Card>
         
-        <div className="text-center">
-          <Button variant="outline" onClick={handleDownloadTemplate} className="gap-2">
+        <div className="flex justify-center space-x-4">
+          <Button 
+            variant="outline" 
+            onClick={handleDownloadTemplate}
+            className="gap-2"
+          >
             <FileDown className="w-4 h-4" />
-            Download CV Template
+            Download CV Template (PDF)
           </Button>
         </div>
       </div>
