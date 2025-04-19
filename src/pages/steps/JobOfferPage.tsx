@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,9 +7,10 @@ import { Tag } from "@/components/ui/tag-input";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { PDFViewer } from "@/components/ui/pdf-viewer";
 import { mockJobOfferData } from "@/lib/mock-data";
 import { Download, Edit, FileText } from "lucide-react";
+import { generateJobOfferPDF } from "@/utils/pdfUtils";
+import { toast } from "sonner";
 
 interface JobOfferPageProps {
   skills: Tag[];
@@ -29,11 +29,30 @@ const JobOfferPage: React.FC<JobOfferPageProps> = ({
   const [companyName, setCompanyName] = useState(mockJobOfferData.companyName);
   const [location, setLocation] = useState(mockJobOfferData.location);
   const [jobDescription, setJobDescription] = useState(mockJobOfferData.jobDescription);
+  const [salary, setSalary] = useState(mockJobOfferData.salary);
+  const [responsibilities, setResponsibilities] = useState(mockJobOfferData.responsibilities);
+  const [benefits, setBenefits] = useState(mockJobOfferData.benefits);
+  const [applicationDeadline, setApplicationDeadline] = useState(mockJobOfferData.applicationDeadline);
   const [activeTab, setActiveTab] = useState("preview");
 
   const handleDownload = () => {
-    // In a real app, this would generate and download a PDF
-    alert("In a real application, this would download the job offer as a PDF document.");
+    try {
+      generateJobOfferPDF(
+        jobTitle,
+        companyName,
+        location,
+        jobDescription,
+        responsibilities,
+        mockJobOfferData.requirements,
+        benefits,
+        salary,
+        applicationDeadline
+      );
+      toast.success("Job offer PDF downloaded successfully");
+    } catch (error) {
+      toast.error("Failed to generate PDF");
+      console.error("PDF generation error:", error);
+    }
   };
 
   return (
@@ -64,11 +83,11 @@ const JobOfferPage: React.FC<JobOfferPageProps> = ({
               companyName={companyName}
               location={location}
               jobDescription={jobDescription}
-              responsibilities={mockJobOfferData.responsibilities}
+              responsibilities={responsibilities}
               requirements={mockJobOfferData.requirements}
-              benefits={mockJobOfferData.benefits}
-              salary={mockJobOfferData.salary}
-              applicationDeadline={mockJobOfferData.applicationDeadline}
+              benefits={benefits}
+              salary={salary}
+              applicationDeadline={applicationDeadline}
               onDownload={handleDownload}
             />
             
@@ -112,15 +131,24 @@ const JobOfferPage: React.FC<JobOfferPageProps> = ({
                     onChange={e => setCompanyName(e.target.value)} 
                   />
                 </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
-                <Input 
-                  id="location" 
-                  value={location} 
-                  onChange={e => setLocation(e.target.value)} 
-                />
+
+                <div className="space-y-2">
+                  <Label htmlFor="location">Location</Label>
+                  <Input 
+                    id="location" 
+                    value={location} 
+                    onChange={e => setLocation(e.target.value)} 
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="salary">Salary</Label>
+                  <Input 
+                    id="salary" 
+                    value={salary} 
+                    onChange={e => setSalary(e.target.value)} 
+                  />
+                </div>
               </div>
               
               <div className="space-y-2">
@@ -130,6 +158,16 @@ const JobOfferPage: React.FC<JobOfferPageProps> = ({
                   value={jobDescription}
                   onChange={e => setJobDescription(e.target.value)}
                   rows={4}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="applicationDeadline">Application Deadline</Label>
+                <Input 
+                  id="applicationDeadline" 
+                  value={applicationDeadline} 
+                  onChange={e => setApplicationDeadline(e.target.value)}
+                  type="date"
                 />
               </div>
               
